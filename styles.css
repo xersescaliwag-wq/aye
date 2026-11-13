@@ -173,12 +173,12 @@ body.logged-in { overflow: hidden; }
 .memory-wall-card.revealed { opacity: 1; transform: rotate(var(--card-angle)) scale(1); }
 .memory-wall-card.revealed:hover { z-index: 5; transform: scale(1.08) rotate(var(--card-angle)); box-shadow: 8px 10px 22px rgba(17,24,39,.22); }
 .memory-wall-card.is-opening { position: fixed; top: 50% !important; left: 50% !important; z-index: 70; transform: translate(-50%, -50%) scale(1.6) rotate(1080deg) !important; transition: top 1100ms cubic-bezier(.2,.8,.2,1), left 1100ms cubic-bezier(.2,.8,.2,1), transform 1100ms cubic-bezier(.2,.8,.2,1); }
-.memory-flyer { position: fixed; z-index: 70; pointer-events: none; transition: left 1100ms cubic-bezier(.2,.8,.2,1), top 1100ms cubic-bezier(.2,.8,.2,1), width 1100ms cubic-bezier(.2,.8,.2,1), height 1100ms cubic-bezier(.2,.8,.2,1), transform 1100ms cubic-bezier(.2,.8,.2,1); }
+.memory-flyer { position: fixed; z-index: 70; pointer-events: none; transform-origin: center center; will-change: left, top, width, height, transform; transition: left 1450ms cubic-bezier(.25,.8,.25,1), top 1450ms cubic-bezier(.25,.8,.25,1), width 1450ms cubic-bezier(.25,.8,.25,1), height 1450ms cubic-bezier(.25,.8,.25,1), transform 1450ms cubic-bezier(.25,.8,.25,1); }
 .memory-flyer { padding: 5px; background: #fff; border: 1px solid #d1d5db; box-shadow: 0 24px 70px rgba(0,0,0,.35); }
 .memory-flyer img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.memory-viewer { position: fixed; inset: 0; z-index: 60; display: grid; place-items: center; padding: 40px; background: rgba(17,24,39,.72); opacity: 0; visibility: hidden; pointer-events: none; transition: opacity 240ms ease, visibility 240ms ease; }
+.memory-viewer { position: fixed; inset: 0; z-index: 60; display: grid; place-items: center; padding: 40px; background: rgba(17,24,39,.72); opacity: 0; visibility: hidden; pointer-events: none; transition: none; }
 .memory-viewer.is-open { opacity: 1; visibility: visible; pointer-events: auto; }
-.memory-viewer img { max-width: min(86vw, 760px); max-height: 82vh; border: 8px solid #fff; box-shadow: 0 24px 70px rgba(0,0,0,.35); object-fit: contain; transform: scale(.88); transition: transform 240ms ease; }
+.memory-viewer img { width: min(86vw, 760px); height: min(82vh, 770px); max-width: none; max-height: none; aspect-ratio: 1 / 1; border: 8px solid #fff; box-shadow: 0 24px 70px rgba(0,0,0,.35); object-fit: cover; transform: scale(1); transition: none; }
 .memory-viewer.is-open img { transform: scale(1); }
 .viewer-close { position: absolute; top: 24px; right: 28px; width: 42px; padding: 0; color: #fff; background: transparent; font-size: 2rem; line-height: 1; }
 .viewer-close:hover { color: #fecdd3; background: transparent; }
