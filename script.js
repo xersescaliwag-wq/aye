@@ -1,4 +1,12 @@
 const loginForm = document.querySelector('#login-form');
+const favicon = document.querySelector('#favicon');
+const faviconFrames = Array.from({ length: 14 }, (_, index) => `./assets/favicon-frames/frame-${String(index).padStart(2, '0')}.png`);
+let faviconFrameIndex = 0;
+window.setInterval(() => {
+  if (!favicon) return;
+  faviconFrameIndex = (faviconFrameIndex + 1) % faviconFrames.length;
+  favicon.href = `${faviconFrames[faviconFrameIndex]}?v=${faviconFrameIndex}`;
+}, 100);
 const formStatus = document.querySelector('#form-status');
 const logoutButton = document.querySelector('#logout-button');
 const loginContainer = document.querySelector('.login-container');
