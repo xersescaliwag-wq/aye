@@ -9,6 +9,10 @@
   </head>
   <body>
     <main class="page-shell first-screen" id="first-screen">
+      <nav class="mobile-topbar" aria-label="Mobile navigation">
+        <span class="mobile-brand">Xerses</span>
+        <button id="mobile-login-button" type="button" aria-expanded="false">Login</button>
+      </nav>
       <section class="container hall" aria-label="Hall">
         <section class="hall-content" aria-label="Hall content">
           <div class="hall-copy">
@@ -27,6 +31,7 @@
       <section class="panel background-panel" aria-label="Background panel">
         <div class="binary-rain" aria-hidden="true"></div>
         <div class="container login-container" aria-label="Login container">
+          <div class="mobile-login-binary binary-rain" aria-hidden="true"></div>
           <form class="login-form" id="login-form">
             <div class="form-header">
               <span class="eyebrow">Welcome back</span>
@@ -51,6 +56,7 @@
             </label>
 
             <button class="login-button" id="login-button" type="submit">Login</button>
+            <button class="mobile-cancel-button" id="mobile-cancel-button" type="button">Cancel</button>
             <p class="form-status" id="form-status" role="status" aria-live="polite"></p>
           </form>
         </div>

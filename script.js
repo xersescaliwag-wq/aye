@@ -3,14 +3,23 @@ const formStatus = document.querySelector('#form-status');
 const logoutButton = document.querySelector('#logout-button');
 const loginContainer = document.querySelector('.login-container');
 const loginButton = document.querySelector('#login-button');
+const mobileLoginButton = document.querySelector('#mobile-login-button');
+const mobileCancelButton = document.querySelector('#mobile-cancel-button');
 const passwordInput = document.querySelector('#password');
 const passwordToggle = document.querySelector('#password-toggle');
 const validUsername = 'Xerses';
 const validPassword = 'Xerses041416';
 const savedLogin = localStorage.getItem('site-login-state');
-const savedAccess = localStorage.getItem('site-access-state');
 if (savedLogin === 'logged-in') document.body.classList.add('logged-in');
-if (savedAccess === 'unlocked') document.body.classList.add('unlocked');
+
+const setMobileLoginOpen = (isOpen) => {
+  document.body.classList.toggle('mobile-login-open', isOpen);
+  mobileLoginButton?.setAttribute('aria-expanded', String(isOpen));
+  if (isOpen) document.querySelector('#username')?.focus();
+};
+
+mobileLoginButton?.addEventListener('click', () => setMobileLoginOpen(true));
+mobileCancelButton?.addEventListener('click', () => setMobileLoginOpen(false));
 const swipeGate = document.querySelector('#swipe-gate');
 const swipeCardStack = document.querySelector('.swipe-card-stack');
 if (swipeCardStack) {
@@ -34,7 +43,8 @@ const paper = document.querySelector('.paper');
 let paperTypingStarted = false;
 
 const startPaperTyping = () => {
-  if (paperTypingStarted) return;
+  if (paperTypingStarted || !document.body.classList.contains('logged-in')) return;
+  if (swipeGate?.querySelector('.swipe-card')) return;
   paperTypingStarted = true;
   paper?.classList.add('typing-active');
   paperParagraphs.forEach((paragraph) => {
@@ -88,6 +98,7 @@ let activeMemoryCard = null;
 let activeMemoryFlyer = null;
 let activeMemoryRect = null;
 let activeMemoryAngle = '0deg';
+let memoryTransitioning = false;
 
 if (memoryWall) {
   const positions = [
@@ -106,7 +117,10 @@ if (memoryWall) {
     card.innerHTML = `<img src="./assets/memories/${index + 1}.jpg" alt="Memory ${index + 1}" />`;
     memoryWall.appendChild(card);
     memoryWallCards.push(card);
-    card.addEventListener('click', () => {
+    card.addEventListener('click', (event) => {
+      event.stopPropagation();
+      if (memoryTransitioning || memoryViewer?.classList.contains('is-open') || activeMemoryCard) return;
+      memoryTransitioning = true;
       activeMemoryCard = card;
       activeMemoryRect = card.getBoundingClientRect();
       activeMemoryAngle = card.style.getPropertyValue('--card-angle') || '0deg';
@@ -128,34 +142,45 @@ if (memoryWall) {
       window.setTimeout(() => {
         viewerImage.src = `./assets/memories/${index + 1}.jpg`;
         viewerImage.alt = `Memory ${index + 1}`;
-        memoryViewer.classList.add('is-open');
-        memoryViewer.setAttribute('aria-hidden', 'false');
+        const showViewer = () => {
+          memoryViewer.classList.add('is-open');
+          memoryViewer.setAttribute('aria-hidden', 'false');
+          window.requestAnimationFrame(() => {
+            if (activeMemoryFlyer) activeMemoryFlyer.style.visibility = 'hidden';
+          });
+        };
+        if (viewerImage.complete) showViewer();
+        else viewerImage.addEventListener('load', showViewer, { once: true });
       }, 1100);
     });
   });
 }
 
-if (savedLogin === 'logged-in') startPaperTyping();
 
 const closeViewer = () => {
+  if (!activeMemoryCard) return;
   memoryViewer?.classList.remove('is-open');
   memoryViewer?.setAttribute('aria-hidden', 'true');
 
   if (activeMemoryCard) {
     const card = activeMemoryCard;
-    if (activeMemoryFlyer && activeMemoryRect) {
-      activeMemoryFlyer.style.left = `${activeMemoryRect.left}px`;
-      activeMemoryFlyer.style.top = `${activeMemoryRect.top}px`;
-      activeMemoryFlyer.style.width = `${activeMemoryRect.width}px`;
-      activeMemoryFlyer.style.height = `${activeMemoryRect.height}px`;
+    const currentRect = card.getBoundingClientRect();
+    if (activeMemoryFlyer && currentRect) {
+      activeMemoryFlyer.style.visibility = 'visible';
+      activeMemoryFlyer.style.left = `${currentRect.left}px`;
+      activeMemoryFlyer.style.top = `${currentRect.top}px`;
+      activeMemoryFlyer.style.width = `${currentRect.width}px`;
+      activeMemoryFlyer.style.height = `${currentRect.height}px`;
       activeMemoryFlyer.style.transform = `rotate(${activeMemoryAngle})`;
       window.setTimeout(() => {
         activeMemoryFlyer?.remove();
         card.style.visibility = '';
         activeMemoryFlyer = null;
+        memoryTransitioning = false;
       }, 1100);
     } else {
       card.style.visibility = '';
+      memoryTransitioning = false;
     }
     activeMemoryCard = null;
     activeMemoryRect = null;
@@ -184,8 +209,7 @@ const createHearts = (container, count) => {
 if (heartRain) createHearts(heartRain, 55);
 if (secondHeartBg) createHearts(secondHeartBg, 70);
 
-const binaryRain = document.querySelector('.binary-rain');
-if (binaryRain) {
+document.querySelectorAll('.binary-rain').forEach((binaryRain) => {
   for (let index = 0; index < 180; index += 1) {
     const stream = document.createElement('span');
     stream.textContent = Array.from({ length: 24 }, () => Math.round(Math.random())).join('\n');
@@ -194,7 +218,7 @@ if (binaryRain) {
     stream.style.animationDelay = `${Math.random() * -14}s`;
     binaryRain.appendChild(stream);
   }
-}
+});
 
 loginForm?.addEventListener('submit', (event) => {
   event.preventDefault();
@@ -213,7 +237,6 @@ loginForm?.addEventListener('submit', (event) => {
 
     window.setTimeout(() => {
       document.body.classList.add('logged-in');
-      startPaperTyping();
       loginButton.disabled = false;
       loginButton.classList.remove('loading');
       loginButton.textContent = 'Login';
@@ -259,7 +282,7 @@ swipeCards.forEach((card) => {
         card.remove();
         if (!swipeGate.querySelector('.swipe-card')) {
           document.body.classList.add('unlocked');
-          localStorage.setItem('site-access-state', 'unlocked');
+          startPaperTyping();
         }
       }, 220);
     } else {
@@ -281,7 +304,6 @@ logoutButton?.addEventListener('click', () => {
   document.body.classList.remove('logged-in');
   document.body.classList.remove('unlocked');
   localStorage.removeItem('site-login-state');
-  localStorage.removeItem('site-access-state');
   loginContainer?.classList.remove('shake');
   loginForm?.reset();
   if (formStatus) {
