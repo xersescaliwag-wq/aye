@@ -136,8 +136,9 @@ if (memoryWall) {
       void activeMemoryFlyer.offsetWidth;
       activeMemoryFlyer.style.left = '50%';
       activeMemoryFlyer.style.top = '50%';
-      activeMemoryFlyer.style.width = 'min(86vw, 760px)';
-      activeMemoryFlyer.style.height = '82vh';
+      const isMobile = window.matchMedia('(max-width: 700px)').matches;
+      activeMemoryFlyer.style.width = isMobile ? 'min(82vw, 320px)' : 'min(86vw, 760px)';
+      activeMemoryFlyer.style.height = isMobile ? 'min(78vh, 540px)' : '82vh';
       activeMemoryFlyer.style.transform = 'translate(-50%, -50%) scale(1) rotate(1080deg)';
       window.setTimeout(() => {
         viewerImage.src = `./assets/memories/${index + 1}.jpg`;
